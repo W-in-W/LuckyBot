@@ -21,6 +21,13 @@ namespace LuckyBot
             var regex = new Regex(weaponName, RegexOptions.IgnoreCase);
             var filter = new BsonDocument("Weapon", regex);
             var weaponList = await GetCollection().Find(filter).ToListAsync();
+            foreach (var item in weaponList)
+            {
+                if (item["Shop"] == "1") item["Shop"] = "Green Mountain и Altar";
+                else if (item["Shop"] == "2") item["Shop"] = "Green Forest и Skallisty Island";
+                else if (item["Shop"] == "3") item["Shop"] = "High Militairy Trader";
+                else item["Shop"] = "Неопознано";
+            }
             return weaponList;
         }
     }

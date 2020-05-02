@@ -5,12 +5,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Interactivity;
 
 namespace LuckyBot
 {
     class Program
     {
         public static DiscordClient discord;
+        public static InteractivityModule interactivity;
         public static CommandsNextModule commands;
         public static string connectionString;
         public static string discordToken;
@@ -30,6 +32,7 @@ namespace LuckyBot
                 UseInternalLogHandler = true,
                 LogLevel = LogLevel.Debug
             });
+            interactivity = discord.UseInteractivity(new InteractivityConfiguration());
             commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefix = "!"
@@ -46,7 +49,7 @@ namespace LuckyBot
                 using (StreamReader sr = new StreamReader(filePath, Encoding.Default))
                 {
                     string text = sr.ReadToEnd();
-                    connectionString = (Regex.Match(text, @"MongoDB: (.*)\r\n")).Groups[1].ToString().Trim();
+                    connectionString = Regex.Match(text, @"MongoDB: (.*)\r\n").Groups[1].ToString().Trim();
                     discordToken = Regex.Match(text, @"Discord: (.*)").Groups[1].ToString().Trim();
                 }
             }
