@@ -15,12 +15,6 @@ namespace LuckyBot
         {
             List<BsonDocument> weaponList = await Core.GetWeaponListAsync(weaponName);
             var uniqueWeapons = weaponList.Select(e => e["Weapon"]).Distinct().ToList();
-            foreach (var VARIABLE in uniqueWeapons)
-            {
-                Console.WriteLine(VARIABLE);
-            }
-
-            Console.ReadKey();
         }
     }
 }
