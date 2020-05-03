@@ -47,6 +47,7 @@ namespace LuckyBot
                     }
                     await ctx.RespondAsync(message);
                 }
+                else await ctx.RespondAsync($"{ctx.User.Mention}, время ожидания ответа истекло.");
             }
             else if (uniqueWeapons.Count == 1)
             {

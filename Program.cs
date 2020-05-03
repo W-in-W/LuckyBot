@@ -11,12 +11,12 @@ namespace LuckyBot
 {
     class Program
     {
-        public static DiscordClient discord;
-        public static InteractivityModule interactivity;
-        public static CommandsNextModule commands;
+        private static DiscordClient discord;
+        private static InteractivityModule interactivity;
+        private static CommandsNextModule commands;
+        private static readonly string filePath = "Connection Info.txt";
+        private static string discordToken;
         public static string connectionString;
-        public static string discordToken;
-        public static readonly string filePath = "Connection Info.txt";
         static void Main(string[] args)
         {
             MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
