@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using MongoDB.Bson;
 
@@ -30,6 +33,7 @@ namespace LuckyBot
                 {
                     message += $"{i + 1}: {uniqueWeapons[i]}\n";
                 }
+
                 await ctx.RespondAsync(message);
                 int userChoice = 0;
                 var msg = await interactivity.WaitForMessageAsync(
@@ -45,6 +49,7 @@ namespace LuckyBot
                     {
                         message += $"{item["Weapon"]} продаётся в {item["Shop"]} за {item["Price"]}$.\n";
                     }
+
                     await ctx.RespondAsync(message);
                 }
                 else await ctx.RespondAsync($"{ctx.User.Mention}, время ожидания ответа истекло.");
@@ -56,9 +61,69 @@ namespace LuckyBot
                 {
                     message += $"{item["Weapon"]} продаётся в {item["Shop"]} за {item["Price"]}$.\n";
                 }
+
                 await ctx.RespondAsync(message);
             }
             else await ctx.RespondAsync("Совпадений не найдено, возможно ошибка в написании?");
+        }
+
+        [Command("clear"), Aliases("cl"), Description("Удаление последних сообщений"),
+         RequirePermissions(Permissions.ManageMessages)]
+        public async Task ClearMessages(CommandContext ctx, [Description("Количество сообщений к удалению")]
+            int amount)
+        {
+            if (amount < 1)
+            {
+                await ctx.RespondAsync("Некорректное число сообщений, попробуйте снова.");
+            }
+            else if (amount > 100)
+            {
+                await ctx.RespondAsync("Удаление не выполнено. Нельзя удалять больше 100 сообщений за раз.");
+            }
+            else
+            {
+                List<DiscordMessage> trashMessages =
+                    new List<DiscordMessage>(ctx.Channel.GetMessagesAsync(amount, ctx.Channel.LastMessageId).Result);
+                trashMessages.Add(ctx.Message);
+                await ctx.Channel.DeleteMessagesAsync(trashMessages);
+                var resultMessage = ctx.RespondAsync($"Удалено {trashMessages.Count - 1} сообщений.").Result;
+                Thread.Sleep(4000);
+                await resultMessage.DeleteAsync();
+            }
+        }
+
+        [Command("trash"), Description("Удаление всех сообщений вплоть до помеченного эмотом :trash_can:"),
+         RequirePermissions(Permissions.ManageMessages)]
+        public async Task ClearTrash(CommandContext ctx)
+        {
+            DiscordEmoji emoji = DiscordEmoji.FromName(ctx.Client, ":trash_can:");
+            var messages = ctx.Channel.GetMessagesAsync(100, ctx.Channel.LastMessageId).Result;
+            DiscordMessage targetMessage = null;
+            foreach (var item in messages)
+            {
+                foreach (var item2 in item.Reactions)
+                {
+                    if (item2.Emoji.Name == emoji.Name)
+                    {
+                        targetMessage = item;
+                        break;
+                    }
+                }
+
+                if (targetMessage != null) break;
+            }
+
+            if (targetMessage != null)
+            {
+                List<DiscordMessage> trashMessages =
+                    new List<DiscordMessage>(ctx.Channel.GetMessagesAsync(after: targetMessage.Id).Result);
+                trashMessages.Add(targetMessage);
+                await ctx.Channel.DeleteMessagesAsync(trashMessages);
+                var resultMessage = ctx.RespondAsync($"Удалено {trashMessages.Count - 1} сообщений.").Result;
+                Thread.Sleep(4000);
+                await ctx.Channel.DeleteMessageAsync(resultMessage);
+            }
+            else await ctx.RespondAsync("Мусор не найден.");
         }
     }
 }
