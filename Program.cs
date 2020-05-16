@@ -17,6 +17,7 @@ namespace LuckyBot
         private static readonly string filePath = "Connection Info.txt";
         private static string discordToken;
         public static string connectionString;
+
         static void Main(string[] args)
         {
             MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();

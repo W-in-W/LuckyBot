@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -30,6 +28,7 @@ namespace LuckyBot
                 else if (item["Shop"] == "3") item["Shop"] = "High Militairy Trader";
                 else item["Shop"] = "Неопознано";
             }
+
             return weaponList;
         }
     }
