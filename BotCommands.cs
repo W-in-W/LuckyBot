@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace LuckyBot
                     message = default;
                     foreach (var item in weaponList)
                     {
-                        message += $"{item["Weapon"]} продаётся в {item["Shop"]} за {item["Price"]}$.\n";
+                        message += $"{item["Weapon"]} продаётся в {item["Shop"]} за {item["Price"].ToDouble().ToString("N0", CultureInfo.GetCultureInfo("ru-RU"))}₽.\n";
                     }
 
                     await ctx.RespondAsync(message);
@@ -59,7 +60,7 @@ namespace LuckyBot
                 string message = default;
                 foreach (var item in weaponList)
                 {
-                    message += $"{item["Weapon"]} продаётся в {item["Shop"]} за {item["Price"]}$.\n";
+                    message += $"{item["Weapon"]} продаётся в {item["Shop"]} за {item["Price"].ToDouble().ToString("N0", CultureInfo.GetCultureInfo("ru-RU"))}₽.\n";
                 }
 
                 await ctx.RespondAsync(message);
