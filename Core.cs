@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -10,25 +8,38 @@ namespace LuckyBot
 {
     public static class Core
     {
+        private static IMongoCollection<BsonDocument> _collection;
         public static IMongoCollection<BsonDocument> GetCollection()
         {
+            if (_collection != null) return _collection;
             MongoClient mongoClient = new MongoClient(Program.connectionString);
             IMongoDatabase database = mongoClient.GetDatabase("DayzWeaponDB");
-            var collection = database.GetCollection<BsonDocument>("AllWeaponsNew");
-            return collection;
+            _collection = database.GetCollection<BsonDocument>("AllWeaponsNew");
+            return _collection;
         }
 
         public static async Task<List<BsonDocument>> GetWeaponListAsync(string weaponName)
         {
             var regex = new Regex(weaponName, RegexOptions.IgnoreCase);
             var filter = new BsonDocument("Weapon", regex);
-            var weaponList = await GetCollection().Find(filter).ToListAsync();
+            var weaponList = await Program.collection.Find(filter).ToListAsync();
             foreach (var item in weaponList)
             {
-                if (item["Shop"] == "1") item["Shop"] = "Green Mountain и Green Forest";
-                else if (item["Shop"] == "2") item["Shop"] = "Altar Black Market";
-                else if (item["Shop"] == "3") item["Shop"] = "High Militairy Trader";
-                else item["Shop"] = "Неопознано";
+                switch (item["Shop"].AsString)
+                {
+                    case "1":
+                        item["Shop"] = ":mountain: **Green Mountain** и :evergreen_tree: **Green Forest**";
+                        break;
+                    case "2":
+                        item["Shop"] = ":pirate_flag: **Altar Black Market**";
+                        break;
+                    case "3":
+                        item["Shop"] = ":moneybag: **High Militairy Trader**";
+                        break;
+                    default:
+                        item["Shop"] = "Неопознано";
+                        break;
+                }
             }
             return weaponList;
         }
