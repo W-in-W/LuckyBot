@@ -22,7 +22,7 @@ namespace LuckyBot
         {
             var regex = new Regex(weaponName, RegexOptions.IgnoreCase);
             var filter = new BsonDocument("Weapon", regex);
-            var weaponList = await Program.collection.Find(filter).ToListAsync();
+            var weaponList = await GetCollection().Find(filter).ToListAsync();
             foreach (var item in weaponList)
             {
                 switch (item["Shop"].AsString)
